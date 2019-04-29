@@ -1,13 +1,25 @@
 const nameInput = document.querySelector("#name");
+const nameLabel = document.querySelector("label[for='name']");
+const mailInput = document.querySelector("#mail");
+const mailLabel = document.querySelector("label[for='mail']");
 const otherTitle = document.querySelector("#other-title");
 const titleSelectMenu = document.querySelector("#title");
 const designSelect = document.querySelector("#design");
+const paymentSelect = document.querySelector("#payment");
 const creditCard = document.querySelector("#credit-card");
+const cc_num = document.querySelector("#cc-num");
+const cc_numLabel = document.querySelector("label[for='cc-num']");
+const zip = document.querySelector("#zip");
+const zipLabel = document.querySelector("label[for='zip']");
+const cvv = document.querySelector("#cvv");
+const cvvLabel = document.querySelector("label[for='cvv']");
+
 const paypal = document.querySelector("#paypal");
 const bitcoin = document.querySelector("#bitcoin");
+const submitButton = document.querySelector("button[type='submit']");
 let activitiesTotalCost = 0;
 const activitiesFieldset = document.querySelector("fieldset.activities");
-
+const registerLegend = activitiesFieldset.children[0];
 nameInput.focus();
 otherTitle.style.display = "none";
 let shirtsColor = ["cornflowerblue", "darkslategrey", "gold", "tomato", "steelblue", "dimgrey"];
@@ -62,6 +74,17 @@ function getActivitiesCost(index, checked) {
         }
     }
     return activitiesTotalCost;
+}
+
+function isNoneActivitySelected() {
+    let noneChecked = true;
+    for (let i = 1; i < activitiesFieldset.children.length; i++) {
+        if (activitiesFieldset.children[i].checked == true) {
+            noneChecked = false;
+            break;
+        }
+    }
+    return noneChecked;
 }
 
 function manageConflict(index, checked) {
@@ -218,6 +241,16 @@ function manageConflict(index, checked) {
     }
 }
 
+function isValidForm() {
+    if (isBlank(nameInput.value) ||
+        isBlank(mailInput.value) ||
+        !isNoneActivitySelected()) {
+        
+        return false;
+    }
+    return true;
+}
+
 
 
 titleSelectMenu.addEventListener("change", e => {
@@ -254,3 +287,56 @@ activitiesFieldset.addEventListener("change", e => {
 
     manageConflict(index, checked);
 });
+
+
+paymentSelect.addEventListener("change", e => {
+    if (e.target.value == "credit card") {
+        creditCard.style.display = null;
+        paypal.style.display = "none";
+        bitcoin.style.display = "none";
+    } else if (e.target.value == "paypal") {
+        creditCard.style.display = "none";
+        paypal.style.display = null;
+        bitcoin.style.display = "none";
+    } else if (e.target.value == "bitcoin") {
+        creditCard.style.display = "none";
+        paypal.style.display = "none";
+        bitcoin.style.display = null;
+    }
+});
+
+submitButton.addEventListener("click", e => {
+    console.log(isValidForm());
+    if (!isValidForm()) {
+        e.preventDefault();
+        nameLabel.style.color = "red";
+        nameInput.style.border = "2px solid red";
+        mailLabel.style.color = "red";
+        mailInput.style.border = "2px solid red";
+
+        registerLegend.style.color = "red";
+    }
+
+    if (paymentSelect.value == "credit card") {
+        
+        if (!(/^\d{13,16}$/.test(cc_num.value)) ||
+        !(/^\d{5}$/.test(zip.value)) ||
+        !(/^\d{3}$/.test(cvv.value))) {
+            e.preventDefault();
+            cc_numLabel.style.color = "red";
+            cc_num.style.border = "2px solid red";
+
+            zipLabel.style.color = "red";
+            zip.style.border = "2px solid red";
+
+            cvvLabel.style.color = "red";
+            cvv.style.border = "2px solid red";
+        }
+    }
+});
+
+function isBlank(str) {
+    return (!str || /^\s*$/.test(str));
+}
+
+
